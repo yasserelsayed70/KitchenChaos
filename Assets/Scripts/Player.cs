@@ -7,7 +7,7 @@ using UnityEngine;
 public class Player : NetworkBehaviour, IKitchenObjectParent {
 
     public static event EventHandler OnAnyPalyerSpawned;
-    public static event EventHandler OnAnyPalyerPickedSomething;
+    public static event EventHandler OnAnyPickedSomething;
 
 
     public static void ResetStaticData()
@@ -168,7 +168,7 @@ public class Player : NetworkBehaviour, IKitchenObjectParent {
 
         if (kitchenObject != null) {
             OnPickedSomething?.Invoke(this, EventArgs.Empty);
-            OnAnyPalyerPickedSomething?.Invoke(this, EventArgs.Empty);
+            OnAnyPickedSomething?.Invoke(this, EventArgs.Empty);
         }
     }
 
@@ -184,4 +184,8 @@ public class Player : NetworkBehaviour, IKitchenObjectParent {
         return kitchenObject != null;
     }
 
+    public NetworkObject GetNetworkObject()
+    {
+        return NetworkObject;
+    }
 }
