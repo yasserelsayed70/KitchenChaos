@@ -87,13 +87,9 @@ public class StoveCounter : BaseCounter, IHasProgress {
                 case State.Frying:
                     fryingTimer.Value += Time.deltaTime;
 
-                   
-
                     if (fryingTimer.Value > fryingRecipeSO.fryingTimerMax) {
                         // Fried
                         KitchenObject.DestroyKitchenObject(GetKitchenObject());
-
-                        GetKitchenObject().DestroySelf();
 
                         KitchenObject.SpawnKitchenObject(fryingRecipeSO.output, this);
 
@@ -110,8 +106,6 @@ public class StoveCounter : BaseCounter, IHasProgress {
                     if (burningTimer.Value > burningRecipeSO.burningTimerMax) {
                         // Fried
                         KitchenObject.DestroyKitchenObject(GetKitchenObject());
-
-                        GetKitchenObject().DestroySelf();
 
                         KitchenObject.SpawnKitchenObject(burningRecipeSO.output, this);
 
@@ -146,9 +140,9 @@ public class StoveCounter : BaseCounter, IHasProgress {
                 if (player.GetKitchenObject().TryGetPlate(out PlateKitchenObject plateKitchenObject)) {
                     // Player is holding a Plate
                     if (plateKitchenObject.TryAddIngredient(GetKitchenObject().GetKitchenObjectSO())) {
-                        GetKitchenObject().DestroySelf();
+                        KitchenObject.DestroyKitchenObject(GetKitchenObject());
 
-                        state.Value = State.Idle;
+                        SetStateIdleServerRpc();
                     }
                 }
             } else {
