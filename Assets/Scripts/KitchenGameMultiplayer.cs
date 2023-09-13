@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -15,6 +16,7 @@ public class KitchenGameMultiplayer : NetworkBehaviour
 
 
     [SerializeField] private KitchenObjectListSO kitchenObjectListSO;
+    [SerializeField] private List<Color> playerColorList;
 
     private NetworkList<PlayerData> playerDataNetworkList;
 
@@ -140,5 +142,15 @@ public class KitchenGameMultiplayer : NetworkBehaviour
     public bool IsPlayerIndexConnected(int playerIndex)
     {
         return playerIndex < playerDataNetworkList.Count;
+    }
+
+    public PlayerData GetPlayerDataFromPlayerIndex(int playerIndex)
+    {
+        return playerDataNetworkList[playerIndex];
+    }
+
+    public Color GetPlayerColor(int colorId)
+    {
+        return playerColorList[colorId];
     }
 }
