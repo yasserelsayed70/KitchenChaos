@@ -19,7 +19,7 @@ public class KitchenGameManager : NetworkBehaviour {
     public event EventHandler OnLocalPlayerReadyChanged;
 
 
-    private enum State {
+    private enum GameState {
         WaitingToStart,
         CountdownToStart,
         GamePlaying,
@@ -28,7 +28,7 @@ public class KitchenGameManager : NetworkBehaviour {
 
     [SerializeField] private Transform playerPrefab;
 
-    private NetworkVariable<State> state = new NetworkVariable<State>(State.WaitingToStart);
+    private NetworkVariable<GameState> gameState = new NetworkVariable<GameState>(GameState.WaitingToStart);
     private bool isLocalPlayerReady;
     private NetworkVariable<float> countdownToStartTimer = new NetworkVariable<float>(3f);
     private NetworkVariable<float> gamePlayingTimer = new NetworkVariable<float>(0f);
@@ -54,7 +54,7 @@ public class KitchenGameManager : NetworkBehaviour {
 
     public override void OnNetworkSpawn()
     {
-        state.OnValueChanged += State_OnValueChanged;
+        gameState.OnValueChanged += GameState_OnValueChanged;
         isGamePaused.OnValueChanged += IsGamePaused_OnValueChanged;
 
         if (IsServer)
@@ -94,13 +94,13 @@ public class KitchenGameManager : NetworkBehaviour {
         }
     }
 
-    private void State_OnValueChanged(State previousValue, State newValue)
+    private void GameState_OnValueChanged(GameState previousValue, GameState newValue)
     {
         OnStateChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void GameInput_OnInteractAction(object sender, EventArgs e) {
-        if (state.Value == State.WaitingToStart) {
+        if (gameState.Value == GameState.WaitingToStart) {
             isLocalPlayerReady = true;
 
             OnLocalPlayerReadyChanged?.Invoke(this, EventArgs.Empty);
@@ -128,7 +128,7 @@ public class KitchenGameManager : NetworkBehaviour {
         }
         if (allClientsReady)
         {
-            state.Value = State.CountdownToStart;
+            gameState.Value = GameState.CountdownToStart;
         }
     }
     private void GameInput_OnPauseAction(object sender, EventArgs e) {
@@ -140,23 +140,23 @@ public class KitchenGameManager : NetworkBehaviour {
         {
             return;
         }
-        switch (state.Value) {
-            case State.WaitingToStart:
+        switch (gameState.Value) {
+            case GameState.WaitingToStart:
                 break;
-            case State.CountdownToStart:
+            case GameState.CountdownToStart:
                 countdownToStartTimer.Value -= Time.deltaTime;
                 if (countdownToStartTimer.Value < 0f) {
-                    state.Value = State.GamePlaying;
+                    gameState.Value = GameState.GamePlaying;
                     gamePlayingTimer.Value = gamePlayingTimerMax;
                 }
                 break;
-            case State.GamePlaying:
+            case GameState.GamePlaying:
                 gamePlayingTimer.Value -= Time.deltaTime;
                 if (gamePlayingTimer.Value < 0f) {
-                    state.Value = State.GameOver;
+                    gameState.Value = GameState.GameOver;
                 }
                 break;
-            case State.GameOver:
+            case GameState.GameOver:
                 break;
         }
     }
@@ -170,11 +170,11 @@ public class KitchenGameManager : NetworkBehaviour {
         }
     }
     public bool IsGamePlaying() {
-        return state.Value == State.GamePlaying;
+        return gameState.Value == GameState.GamePlaying;
     }
 
     public bool IsCountdownToStartActive() {
-        return state.Value == State.CountdownToStart;
+        return gameState.Value == GameState.CountdownToStart;
     }
 
     public float GetCountdownToStartTimer() {
@@ -182,12 +182,12 @@ public class KitchenGameManager : NetworkBehaviour {
     }
 
     public bool IsGameOver() {
-        return state.Value == State.GameOver;
+        return gameState.Value == GameState.GameOver;
     }
 
     public bool IsWaitingToStart()
     {
-        return state.Value == State.WaitingToStart;
+        return gameState.Value == GameState.WaitingToStart;
     }
 
     public bool IsLocalPlayerReady()
